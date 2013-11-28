@@ -1,0 +1,71 @@
+//
+//  main.c
+//  print all permutations of a given string
+//
+//  Created by Hsieh Yu Hua on 2013/11/28.
+//  Copyright (c) 2013年 Hsieh Yu Hua_NTHU_s102062210. All rights reserved.
+//
+
+#include <stdio.h>
+#include <string.h>
+void permut(char*address,int start,int end);
+void swap(char *ch1,char *ch2);
+int match(char *address,int start,int i);
+int main(int argc, const char * argv[])
+{
+    int longness;
+    char input[10]={0};
+    scanf("%s",input);
+    longness=(int)strlen(input);
+    permut(input,0,longness-1);
+    return 0;
+}
+
+//funcion to swap values of two pointers
+void swap(char *ch1,char *ch2)
+{
+    char temp;
+    temp=*ch1;
+    *ch1=*ch2;
+    *ch2=temp;
+}
+
+int match(char *address,int start,int i)
+{
+    if (start==i) {
+        return 0;
+    }
+    for (int k=start; k<i; k++) {
+        if (address[k]==address[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+//* Function to print permutations of string
+//This function takes three parameters:
+//1. String
+//2. Starting index of the string
+//3. Ending index of the string. */
+
+void permut(char *address,int start,int end)
+{
+    int i;
+    if (start==end)
+    {
+        printf("%s\n",address);
+    }
+    else
+    {
+        for (i=start; i<=end; i++)
+        {
+            if(!match(address, start, i))
+            {
+                swap((address+start), (address+i));
+                permut(address,start+1,end);
+                swap((address+start),(address+i));//backtrack
+            }
+        }
+    }
+}
+
