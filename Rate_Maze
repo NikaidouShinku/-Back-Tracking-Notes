@@ -6,6 +6,7 @@
 //  Copyright (c) 2013年 Hsieh Yu Hua_NTHU_s102062210. All rights reserved.
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define N 10 // N=X  X*X-SIZE MAZE
 int read(char maze[N][N],char *argv[]);
 int solve_maze(char maze[N][N]);
@@ -39,8 +40,8 @@ int read(char maze[N][N],char *argv[])
 }
 
 int solve_maze(char maze[N][N]){
-    int sol[N][N]={'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
-    
+    int sol[N][N]={};
+    memset(sol, '0', sizeof(sol));
     if (solve_maze_fn(maze,1,1,sol)==1) {//i=false
         printf("No solution");
         return 0;
