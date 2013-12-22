@@ -1,0 +1,112 @@
+//
+//  main.c
+//  pg7
+//
+//  Created by Hsieh Yu Hua on 2013/12/20.
+//  Copyright (c) 2013年 Hsieh Yu Hua_NTHU_s102062210. All rights reserved.
+#include <stdio.h>
+#include <stdlib.h>
+#define N 10 // N=X  X*X-SIZE MAZE
+int read(char maze[N][N],char *argv[]);
+int solve_maze(char maze[N][N]);
+int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N]);
+int isvalid(char maze[N][N],int x,int y);
+void print_sol(int sol[N][N]);
+
+
+int main(int argc, char *argv[])
+{
+    char maze[N][N]={0};//used to store input.txt
+    read(maze,argv);//read txt into memory;
+    solve_maze(maze);
+    return 0;
+}
+
+int read(char maze[N][N],char *argv[])
+{
+    FILE *input;
+	//input=fopen(argv[1],"rt");//open file;
+    input=fopen("/Users/Andy/Desktop/H.W./map1.txt", "rt");
+	if ( input==NULL ){
+		printf("open %s fail!\n",argv[1]);
+		exit(1);//wrong open;
+    }
+    
+    for (int i=0; i<N; i++) {
+            fscanf(input,"%s",maze+i);//put txt into memory;
+    }
+    
+    
+    for (int i=0; i<N; i++) {
+        for (int j=0; j<N; j++) {
+            printf("%c",maze[i][j]);
+        }
+        printf("\n");
+    }
+    
+    printf("INPUT SUCCESS!!\n");
+    
+    return 0;
+}
+
+int solve_maze(char maze[N][N]){
+    int sol[N][N]={0};
+    
+    if (solve_maze_fn(maze,1,1,sol)==1) {//i=false
+        printf("No solution");
+        return 0;
+    }
+    
+    print_sol(sol);
+    return 0;
+}
+
+/*A recursive fn to solve the maze*/
+int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N])
+{
+    //if x,y is destination ,return true(0))
+    if (x==N-2&&y==N-2) {
+        sol[x][y]=1;
+        return 0;//return true (0)
+    }
+    //check if maze is valid or not
+    if (isvalid(maze,x,y)==0) {
+        //mark x,y as part of the solution of path.
+        sol[x][y]=1;
+        
+        //move |>
+        if (solve_maze_fn(maze, x+1, y, sol)==0) {
+            return 0;//return true;
+        }
+        //move |v
+        if (solve_maze_fn(maze, x, y+1, sol)==0){
+            return 0;//return true;
+        }
+
+        /*If none of the above movements work,then "BATRACK":
+         unmark x,y,as part of solution path*/
+        sol[x][y]=0;
+        return 1;//return false
+        
+    }
+    return 1;//return false
+}
+
+int isvalid(char maze[N][N],int x,int y)
+{
+    //if x,y,is outside the maze, then return 1 (false)
+    if (x>=1 && x<N-1 && y>=1 && y<N-1 && maze[x][y]=='0') {
+        return 0;//true
+    }
+    return 1;//false
+}
+
+void print_sol(int sol[N][N])
+{
+    for (int i=0; i<N; i++) {
+        for (int j=0; j<N; j++) {
+            printf("%d",sol[i][j]);
+        }
+        printf("\n");
+    }
+}
