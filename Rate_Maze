@@ -11,7 +11,7 @@ int read(char maze[N][N],char *argv[]);
 int solve_maze(char maze[N][N]);
 int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N]);
 int isvalid(char maze[N][N],int x,int y);
-void print_sol(int sol[N][N]);
+void print_sol(int sol[N][N],char maze[N][N]);
 
 
 int main(int argc, char *argv[])
@@ -35,44 +35,33 @@ int read(char maze[N][N],char *argv[])
     for (int i=0; i<N; i++) {
             fscanf(input,"%s",maze+i);//put txt into memory;
     }
-    
-    
-    for (int i=0; i<N; i++) {
-        for (int j=0; j<N; j++) {
-            printf("%c",maze[i][j]);
-        }
-        printf("\n");
-    }
-    
-    printf("INPUT SUCCESS!!\n");
-    
     return 0;
 }
 
 int solve_maze(char maze[N][N]){
-    int sol[N][N]={0};
+    int sol[N][N]={'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
     
     if (solve_maze_fn(maze,1,1,sol)==1) {//i=false
         printf("No solution");
         return 0;
     }
     
-    print_sol(sol);
+    print_sol(sol,maze);
     return 0;
 }
 
 /*A recursive fn to solve the maze*/
 int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N])
 {
-    //if x,y is destination ,return true(0))
+    //if x,y reach destination ,return true(0))
     if (x==N-2&&y==N-2) {
-        sol[x][y]=1;
+        sol[x][y]='X';
         return 0;//return true (0)
     }
     //check if maze is valid or not
     if (isvalid(maze,x,y)==0) {
         //mark x,y as part of the solution of path.
-        sol[x][y]=1;
+        sol[x][y]='X';
         
         //move |>
         if (solve_maze_fn(maze, x+1, y, sol)==0) {
@@ -82,10 +71,23 @@ int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N])
         if (solve_maze_fn(maze, x, y+1, sol)==0){
             return 0;//return true;
         }
-
+        
+        /*
+        //move |<
+         if (solve_maze_fn(maze, x-1, y, sol)==0){
+            return 0;//return true;
+         }
+         
+        //move |^
+        if (solve_maze_fn(maze, x, y-1, sol)==0){
+            return 0;//return true;
+        }
+         */
+        
+        
         /*If none of the above movements work,then "BATRACK":
          unmark x,y,as part of solution path*/
-        sol[x][y]=0;
+        sol[x][y]='0';  //"BATRACKING!!!"
         return 1;//return false
         
     }
@@ -101,11 +103,18 @@ int isvalid(char maze[N][N],int x,int y)
     return 1;//false
 }
 
-void print_sol(int sol[N][N])
+void print_sol(int sol[N][N],char maze[N][N])
 {
     for (int i=0; i<N; i++) {
         for (int j=0; j<N; j++) {
-            printf("%d",sol[i][j]);
+            if (sol[i][j]=='X') {
+                maze[i][j]='X';
+            }
+        }
+    }
+    for (int i=0; i<N; i++) {
+        for (int j=0; j<N; j++) {
+            printf("%c",maze[i][j]);
         }
         printf("\n");
     }
