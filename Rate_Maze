@@ -10,8 +10,8 @@
 #define N 10 // N=X  X*X-SIZE MAZE
 int read(char maze[N][N],char *argv[]);
 int solve_maze(char maze[N][N]);
-int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N]);
-int isvalid(char maze[N][N],int x,int y);
+int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N],int time[N][N],int ptdir);
+int isvalid(char maze[N][N],int x,int y,int time[N][N]);
 void print_sol(int sol[N][N],char maze[N][N]);
 
 
@@ -40,9 +40,11 @@ int read(char maze[N][N],char *argv[])
 }
 
 int solve_maze(char maze[N][N]){
-    int sol[N][N]={};
+    int sol[N][N]={0};
     memset(sol, '0', sizeof(sol));
-    if (solve_maze_fn(maze,1,1,sol)==1) {//i=false
+    int time[N][N]={0};
+    memset(sol, 0, sizeof(sol));
+    if (solve_maze_fn(maze,1,1,sol,time,0)==1) {//1=false
         printf("No solution");
         return 0;
     }
@@ -52,7 +54,8 @@ int solve_maze(char maze[N][N]){
 }
 
 /*A recursive fn to solve the maze*/
-int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N])
+
+int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N],int time[N][N],int ptdir)
 {
     //if x,y reach destination ,return true(0))
     if (x==N-2&&y==N-2) {
@@ -60,32 +63,41 @@ int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N])
         return 0;//return true (0)
     }
     //check if maze is valid or not
-    if (isvalid(maze,x,y)==0) {
+    if (isvalid(maze,x,y,time)==0) {
         //mark x,y as part of the solution of path.
         sol[x][y]='X';
+
+        //int past_direction(ptdir) is used to marked the previous route, like 1 == |> 2 == |v
+        //Note that if the previous route is => , we can't do =< ,cuz it will
+        //cause unlimited roop.
         
-        //move |>
-        if (solve_maze_fn(maze, x+1, y, sol)==0) {
-            return 0;//return true;
+        if(ptdir!=3){//if the previous walk is |<,don't walk |>
+            //move |>
+            if (solve_maze_fn(maze, x+1, y, sol,time,1)==0) {
+                return 0;//return true;
+            }
         }
-        //move |v
-        if (solve_maze_fn(maze, x, y+1, sol)==0){
-            return 0;//return true;
+        
+        if(ptdir!=4){//if the previous walk is |^,don't walk |V
+            //move |v
+            if (solve_maze_fn(maze, x, y+1, sol,time,2)==0){
+                return 0;//return true;
+            }
         }
         
-        /*
-        //move |<
-         if (solve_maze_fn(maze, x-1, y, sol)==0){
-            return 0;//return true;
-         }
-         
-        //move |^
-        if (solve_maze_fn(maze, x, y-1, sol)==0){
-            return 0;//return true;
+        if(ptdir!=1){//if the previous walk is |>,don't walk |<
+            //move |<
+            if (solve_maze_fn(maze, x-1, y, sol,time,3)==0){
+                return 0;//return true;
+            }
         }
-         */
         
-        
+        if(ptdir!=2){//if the previous walk is |V,don't walk |^
+            //move |^
+            if (solve_maze_fn(maze, x, y-1, sol,time,4)==0){
+                return 0;//return true;
+            }
+        }
         /*If none of the above movements work,then "BATRACK":
          unmark x,y,as part of solution path*/
         sol[x][y]='0';  //"BATRACKING!!!"
@@ -95,10 +107,13 @@ int solve_maze_fn(char maze[N][N],int x,int y,int sol[N][N])
     return 1;//return false
 }
 
-int isvalid(char maze[N][N],int x,int y)
+int isvalid(char maze[N][N],int x,int y,int time[N][N])
 {
     //if x,y,is outside the maze, then return 1 (false)
-    if (x>=1 && x<N-1 && y>=1 && y<N-1 && maze[x][y]=='0') {
+    if (x>=1 && x<N-1 && y>=1 && y<N-1 && maze[x][y]=='0'&&time[x][y]<=0) {
+        time[x][y]++;//time is used to mark how many times,the path is walked,
+        //in order to prevent unlimited roop like: |>|v|<|^|>|v|<|^.....
+        //every slot should only be walked "once". so time[x][y]<=0
         return 0;//true
     }
     return 1;//false
@@ -106,6 +121,7 @@ int isvalid(char maze[N][N],int x,int y)
 
 void print_sol(int sol[N][N],char maze[N][N])
 {
+    //COPY the sol to maze,
     for (int i=0; i<N; i++) {
         for (int j=0; j<N; j++) {
             if (sol[i][j]=='X') {
@@ -113,6 +129,7 @@ void print_sol(int sol[N][N],char maze[N][N])
             }
         }
     }
+    //print maze (map added one route(X) to destination)
     for (int i=0; i<N; i++) {
         for (int j=0; j<N; j++) {
             printf("%c",maze[i][j]);
