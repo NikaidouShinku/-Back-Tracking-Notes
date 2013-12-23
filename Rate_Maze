@@ -34,7 +34,7 @@ int read(char maze[N][N],char *argv[])
     }
     
     for (int i=0; i<N; i++) {
-            fscanf(input,"%s",maze+i);//put txt into memory;
+            fscanf(input,"%s",maze[i]);//put txt into memory;
     }
     return 0;
 }
